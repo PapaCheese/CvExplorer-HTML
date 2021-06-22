@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html xmlns='http://www.w3.org/1999/xhtml' lang='' xml:lang=''>
+
 <head>
 	<meta charset='utf-8' />
 	<meta name='viewport' content='width=device-width, user-scalable=no' />
 	<link id='-gd-engine-icon' rel='icon' type='image/png' href='favicon.png' />
-	<title>Cv Explorer</title>
+	<title>12React</title>
 	<style type='text/css'>
-
 		body {
 			touch-action: none;
 			margin: 0;
@@ -52,6 +52,24 @@
 			visibility: hidden;
 		}
 
+		#status-logo {
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+			width: 30%;
+		}
+
+		#status-loading {
+			position: absolute;
+			left: 0;
+			top: 20%;
+			right: 0;
+			bottom: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
 		#status-progress {
 			width: 366px;
 			height: 7px;
@@ -74,8 +92,8 @@
 			width: 0;
 			box-sizing: border-box;
 			transition: width 0.5s linear;
-			background-color: #202020;
-			border: 1px solid #222223;
+			background-color: #f8e800;
+			border: 1px solid #cca700;
 			box-shadow: 0 0 1px 1px #27282E;
 			border-radius: 3px;
 		}
@@ -85,7 +103,7 @@
 			position: relative;
 		}
 
-		#status-indeterminate > div {
+		#status-indeterminate>div {
 			width: 4.5px;
 			height: 0;
 			border-style: solid;
@@ -95,14 +113,37 @@
 			position: absolute;
 		}
 
-		#status-indeterminate > div:nth-child(1) { transform: rotate( 22.5deg); }
-		#status-indeterminate > div:nth-child(2) { transform: rotate( 67.5deg); }
-		#status-indeterminate > div:nth-child(3) { transform: rotate(112.5deg); }
-		#status-indeterminate > div:nth-child(4) { transform: rotate(157.5deg); }
-		#status-indeterminate > div:nth-child(5) { transform: rotate(202.5deg); }
-		#status-indeterminate > div:nth-child(6) { transform: rotate(247.5deg); }
-		#status-indeterminate > div:nth-child(7) { transform: rotate(292.5deg); }
-		#status-indeterminate > div:nth-child(8) { transform: rotate(337.5deg); }
+		#status-indeterminate>div:nth-child(1) {
+			transform: rotate(22.5deg);
+		}
+
+		#status-indeterminate>div:nth-child(2) {
+			transform: rotate(67.5deg);
+		}
+
+		#status-indeterminate>div:nth-child(3) {
+			transform: rotate(112.5deg);
+		}
+
+		#status-indeterminate>div:nth-child(4) {
+			transform: rotate(157.5deg);
+		}
+
+		#status-indeterminate>div:nth-child(5) {
+			transform: rotate(202.5deg);
+		}
+
+		#status-indeterminate>div:nth-child(6) {
+			transform: rotate(247.5deg);
+		}
+
+		#status-indeterminate>div:nth-child(7) {
+			transform: rotate(292.5deg);
+		}
+
+		#status-indeterminate>div:nth-child(8) {
+			transform: rotate(337.5deg);
+		}
 
 		#status-notice {
 			margin: 0 100px;
@@ -114,13 +155,20 @@
 	</style>
 
 </head>
+
 <body>
 	<canvas id='canvas'>
 		HTML5 canvas appears to be unsupported in the current browser.<br />
 		Please try updating or use a different browser.
 	</canvas>
+	<img id="status-logo" src="logo_bugsec.png" alt="BugSec">
+	<br>
+	<span id="status-loading" style="color: white; font-size: 300%;">Loading..</span>
+
 	<div id='status'>
-		<div id='status-progress' style='display: none;' oncontextmenu='event.preventDefault();'><div id ='status-progress-inner'></div></div>
+		<div id='status-progress' style='display: none;' oncontextmenu='event.preventDefault();'>
+			<div id='status-progress-inner'></div>
+		</div>
 		<div id='status-indeterminate' style='display: none;' oncontextmenu='event.preventDefault();'>
 			<div></div>
 			<div></div>
@@ -137,11 +185,13 @@
 	<script type='text/javascript' src='index.js'></script>
 	<script type='text/javascript'>//<![CDATA[
 
-		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":8516480,"index.wasm":18131449},"gdnativeLibs":[]};
+		const GODOT_CONFIG = { "args": [], "canvasResizePolicy": 2, "executable": "index", "experimentalVK": true, "fileSizes": { "index.pck": 4671808, "index.wasm": 12660493 }, "gdnativeLibs": [] };
 		var engine = new Engine(GODOT_CONFIG);
 
-		(function() {
+		(function () {
 			const INDETERMINATE_STATUS_STEP_MS = 100;
+			var statusLogo = document.getElementById('status-logo');
+			var statusLoading = document.getElementById('status-loading');
 			var statusProgress = document.getElementById('status-progress');
 			var statusProgressInner = document.getElementById('status-progress-inner');
 			var statusIndeterminate = document.getElementById('status-indeterminate');
@@ -161,15 +211,17 @@
 
 				if (statusMode === mode || !initializing)
 					return;
-				[statusProgress, statusIndeterminate, statusNotice].forEach(elem => {
+				[statusProgress, statusIndeterminate, statusNotice, statusLogo, statusLoading].forEach(elem => {
 					elem.style.display = 'none';
 				});
-				animationCallbacks = animationCallbacks.filter(function(value) {
+				animationCallbacks = animationCallbacks.filter(function (value) {
 					return (value != animateStatusIndeterminate);
 				});
 				switch (mode) {
 					case 'progress':
 						statusProgress.style.display = 'block';
+						statusLogo.style.display = 'block';
+						statusLoading.style.display = 'flex';
 						break;
 					case 'indeterminate':
 						statusIndeterminate.style.display = 'block';
@@ -222,7 +274,7 @@
 				engine.startGame({
 					'onProgress': function (current, total) {
 						if (total > 0) {
-							statusProgressInner.style.width = current/total * 100 + '%';
+							statusProgressInner.style.width = current / total * 100 + '%';
 							setStatusMode('progress');
 							if (current === total) {
 								// wait for progress bar animation
@@ -242,5 +294,5 @@
 		})();
 	//]]></script>
 </body>
-</html>
 
+</html>
